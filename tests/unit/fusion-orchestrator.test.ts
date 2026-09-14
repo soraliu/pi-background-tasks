@@ -34,6 +34,9 @@ import {
 } from '../../src/core/fusion/pi-child.js';
 import { emptyLedger } from '../helpers/fusion-canonical.js';
 
+// 屏蔽宿主 shell 的 PI_BG_RUNTIME_ROOT,保证默认布局测试 deterministic(见 registry.test 同款)。
+delete process.env['PI_BG_RUNTIME_ROOT'];
+
 const ledger: FusionContextOmissionLedgerV2 = emptyLedger(FUSION_COMMAND_CONTEXT_POLICY_ID);
 
 function resolved(qualifiedId: string, contextWindow = 200_000): ResolvedFusionModel {

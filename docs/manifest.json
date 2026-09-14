@@ -50,12 +50,13 @@
       "state": "stale-authored-prose"
     },
     {
-      "authored_body_sha256": "sha256:98480d246e890ee3dc1ed98cdb007cbbe016cdba896d700221a06132253393f2",
+      "authored_body_sha256": "sha256:5a218e235d6336ee34e68502ce07d907fb47070e9768aea2db8e25d97ab7c388",
       "covers_sources": [
         "src/core/common.ts",
         "src/core/registry.ts",
         "src/core/reload-shell-owner.ts",
         "src/core/shell-policy.ts",
+        "src/core/store-root.ts",
         "src/core/windows-taskkill.ts"
       ],
       "doc_id": "subsystems/background-task-runtime",
@@ -482,6 +483,7 @@
         "src/core/registry.ts",
         "src/core/reload-shell-owner.ts",
         "src/core/shell-policy.ts",
+        "src/core/store-root.ts",
         "src/core/windows-taskkill.ts"
       ],
       "covers_surfaces": [],
@@ -1303,7 +1305,7 @@
       {
         "availability": "always",
         "default_available": true,
-        "description": "Start a named long-running shell command in the background and return immediately with a task ID and output path. By default, completed, failed, or killed terminal state is delivered automatically as <background-task-notification> and starts a follow-up agent turn; do not sleep or poll merely to wait. Output is written to .pi/tasks and model-visible logs are bounded to 50.0KB.",
+        "description": "Start a named long-running shell command in the background and return immediately with a task ID and output path. By default, completed, failed, or killed terminal state is delivered automatically as <background-task-notification> and starts a follow-up agent turn; do not sleep or poll merely to wait. Output is written to .pi/tasks (or under PI_BG_RUNTIME_ROOT/tasks when that environment variable is set) and model-visible logs are bounded to 50.0KB.",
         "id": "tool:bg_run",
         "kind": "tool",
         "label": "Background Run",
@@ -1964,6 +1966,9 @@
       "subsystems/background-task-runtime"
     ],
     "src/core/shell-policy.ts": [
+      "subsystems/background-task-runtime"
+    ],
+    "src/core/store-root.ts": [
       "subsystems/background-task-runtime"
     ],
     "src/core/task-durable.ts": [

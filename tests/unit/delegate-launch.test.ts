@@ -28,6 +28,9 @@ import {
 } from '../../src/core/delegate/hook-contract.js';
 import { sessionWith, userMessage } from '../helpers/fusion-canonical.js';
 
+// 屏蔽宿主 shell 的 PI_BG_RUNTIME_ROOT,保证默认布局测试 deterministic(见 registry.test 同款)。
+delete process.env['PI_BG_RUNTIME_ROOT'];
+
 const roots: string[] = [];
 
 const OBSERVED_EVIDENCE: DelegateHookContractEvidence = {

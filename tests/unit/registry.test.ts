@@ -132,6 +132,10 @@ interface HarnessOptions {
   reloadShellOwner?: ReloadShellOwnerHubV1;
 }
 
+// 屏蔽宿主 shell 的 PI_BG_RUNTIME_ROOT:未显式传 env 的测试一律按默认 <cwd>/.pi 布局,
+// 防止单测写入 HOME;显式传 env 的 relocate 用例不受影响。
+delete process.env['PI_BG_RUNTIME_ROOT'];
+
 async function createHarness(options: HarnessOptions = {}) {
   const root = await mkdtemp(join(tmpdir(), 'pi-bg-registry-'));
   const cwd = join(root, 'project');
@@ -526,6 +530,33 @@ async function createCommittedFusionResult(
 }
 
 void describe('BackgroundTaskRegistry', () => {
+  void it('keeps the runtime dir under cwd when PI_BG_RUNTIME_ROOT is unset', async () => {
+    const h = await createHarness({ platform: 'linux', env: {} });
+    const dir = await h.registry.ensureRuntimeDir(h.ctx);
+    const runId = `registry-test-${String(process.pid)}`;
+    assert.equal(dir.abs, join(h.cwd, '.pi', 'tasks', runId));
+    assert.equal(dir.display, join('.pi', 'tasks', runId));
+  });
+
+  void it('relocates the runtime dir to PI_BG_RUNTIME_ROOT when set', async () => {
+    const store = await mkdtemp(join(tmpdir(), 'pi-bg-store-root-'));
+    try {
+      const h = await createHarness({
+        platform: 'linux',
+        env: { PI_BG_RUNTIME_ROOT: store },
+      });
+      const dir = await h.registry.ensureRuntimeDir(h.ctx);
+      assert.ok(dir.abs.startsWith(join(store, 'tasks')), dir.abs);
+      assert.ok(!dir.abs.startsWith(h.cwd), dir.abs);
+      // display becomes absolute: relative paths under a relocated root would
+      // resolve against the wrong cwd when surfaced to agents and the UI.
+      assert.equal(dir.display, dir.abs);
+    } finally {
+      await rm(store, { recursive: true, force: true });
+    }
+  });
+
+
   void it('validates reload survival before admission, filesystem, insertion, wrapper, or spawn', async () => {
     const hub = createReloadShellOwnerHubForTests();
     const h = await createHarness({ reloadShellOwner: hub });

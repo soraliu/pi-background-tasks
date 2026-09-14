@@ -26,6 +26,9 @@ import {
 } from '../../src/core/fusion/types.js';
 import type { RunPiChildOptions } from '../../src/core/fusion/pi-child.js';
 
+// 屏蔽宿主 shell 的 PI_BG_RUNTIME_ROOT,保证默认布局测试 deterministic(见 registry.test 同款)。
+delete process.env['PI_BG_RUNTIME_ROOT'];
+
 function resolved(qualifiedId: string): ResolvedFusionModel {
   const slash = qualifiedId.indexOf('/');
   return { selection: '$current', source: 'current', provider: qualifiedId.slice(0, slash), model: qualifiedId.slice(slash + 1), qualifiedId, thinkingLevel: 'high', contextWindow: 200_000, maxOutputTokens: 32_768 };
